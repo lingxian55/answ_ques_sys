@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/zui.min.css">
+
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script src="js/zui.min.js"></script>
+    <script src="js/ini.js"></script>
+    <script src=" https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+<nav class="navbar" role="navigation">
+    <div class="container-fluid">
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand" href="index.html">首页</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+                <li><a href="/myquestion.html">我的问题</a></li>
+                <li><a href="/myanswer.html">我的回答</a></li>
+                <!-- 导航中的下拉菜单 -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login.html" id="login">登录</a></li>
+                <li><a href="/register.html" type="button" id="register">注册</a></li>
+            </ul>
+            <div class="input-group">
+                <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                    <input style="width:1000px" id="inputSearchExample3" type="search" class="form-control search-input" placeholder="搜索">
+                    <span class="input-group-btn">
+    <button class="btn btn-primary" type="button">搜索</button>
+  </span>
+                    <label for="inputSearchExample3" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
+                </div>
+            </div>
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+<div class="form-group">
+    <button type="submit" id="register-btn" class="btn btn-primary btn-block btn-lg" style="width: 100px; float: right;" >我有问题</button>
+</div>
+<div id="container" style="width:50%;margin:auto;">
+    <template v-for="object in objects">
+    <a :href="'question.html?questionId='+object.questionId" class="card">
+        <div class="col-md-4 col-sm-6 col-lg-3">
+            <img v-bind:src="userpic" height="200px">
+        </div>
+        <div class="card-heading">
+            <strong>
+                {{object.questionContent}}
+            </strong>
+        </div>
+        <div class="card-content text-muted">
+            <br>
+            <div class="card-actions" style="float:right;color: #AA0000;" >
+                <div id="pull-right text-danger">
+                    question was published by
+                    <br>
+                </div>
+                {{username}}:{{object.publishTime}}
+            </div>
+        </div>
+    </a>
+    </template>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var data=getdata("/loginApi");
+        if(IsLogin()){
+            $("#login").html("欢迎回来," + data.data.username + "<img src=\"" + data.data.picture + "\" style=width:20px;height:20px></img>");
+            $("#login").attr("href","myhome.html");
+            $("#register").html("退出");;
+            $("#register").attr("id","logout");
+            $("#logout").attr("href", "index.html");
+
+        }
+        else {
+            self.location = "login.html";
+        }
+        $("#logout").click(function () {
+
+            logout();
+        })
+    })
+</script>
+<script>
+    var data1 = getdata("/loginApi");
+    var data2 = getdata("/getAllQuestionByUsernameApi");
+    var container = new Vue({
+        el: "#container",
+        data:{
+            username: data1.data.username,
+            userpic: data1.data.picture,
+            objects: data2.data
+        }
+    });
+    $("#register-btn").click(function () {
+        location="add_question.html";
+    })
+
+</script>
+</body>
+</html>

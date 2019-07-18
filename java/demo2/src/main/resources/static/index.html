@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:width="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <!-- ZUI 标准版压缩后的 CSS 文件 -->
+    <link rel="stylesheet" href="css/zui.min.css">
+
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script src="js/zui.min.js"></script>
+    <script src=" https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="js/ini.js"></script>
+</head>
+<body>
+<nav class="navbar" role="navigation">
+    <div class="container-fluid">
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand" href="index.html">首页</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+                <li><a href="/myquestion.html">我的问题</a></li>
+                <li><a href="/myanswer.html">我的回答</a></li>
+                <!-- 导航中的下拉菜单 -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login.html" id="login">登录</a></li>
+                <li><a href="/register.html" type="button" id="register">注册</a></li>
+            </ul>
+            <div class="input-group">
+                <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                <input style="width:1000px" id="inputSearchExample3" type="search" class="form-control search-input" placeholder="搜索">
+                    <span class="input-group-btn"><button class="btn btn-primary" type="button">搜索</button></span>
+                <div style="display: none" id="search_t">
+                    <ul v-for="question in questions">
+                        <template>
+                            <li :key="question.questionId">
+                                <a :href="'question.html?questionId='+question.questionId">{{question.questionContent}}</a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                    <script>
+                        var vm= new Vue({
+                            el:"#search_t",
+                            data:{
+                                questions:[]
+                            } ,
+                            mounted: function() {
+                                var self = this;
+                            }
+                        })
+                        $('#searchboxExample').searchBox({
+                            escToClear: true,
+                            onSearchChange: function(searchKey, isEmpty) {
+                                if(searchKey!=''){
+                                    var data=postdata("searchQuestionApi",{key:searchKey});
+                                    if(data.data.length!=0){
+                                        vm.questions=data.data;
+
+                                    }
+                                }
+
+                            },
+                            changeDelay:3000,
+                            onFocus:function () {
+                                $("#search_t").show();
+                            },
+                            onBlur:function () {
+                                // $("#search_t").hide();
+                            }
+                        });
+                    </script>
+
+                    <label for="inputSearchExample3" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
+                </div>
+            </div>
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+<div class="form-group">
+    <button type="submit" id="register-btn" class="btn btn-primary btn-block btn-lg" style="width: 100px; float: right;" >我有问题</button>
+    <script>
+        $("#register-btn").click(function () {
+            self.location="add_question.html";
+        })
+    </script>
+</div>
+<div class="container" width:70%>
+    <script>
+        var data=getdata("/getAllQuestionApi");
+        data=data.data;
+        for (var i in data) {
+            var id=data[i].questionId;
+            var data2=postdata("/getAllAnswerByQuestionIdApi",{questionId:id});
+
+            var content=data[i].questionContent;
+            var publishtime=data[i].publishTime;
+            var username=data[i].questionVector;
+            var user=postdata("/getUserByUsernameApi",{username:username});
+            var img="";
+            if(user.data.picture!=null){
+                img=user.data.picture;
+            }
+            var content2="";
+            if(data2.data[0]!=null){
+                answer=data2.data[0];
+                content2=answer.questionVector+":"+answer.answerContent+"<br/>publish on："+answer.publishTime;
+            }
+
+            document.write("<a class=\"card\" href=\"question.html?questionId="+id+"\">\n" +
+                "\t<div class=\"col-md-4 col-sm-6 col-lg-3\">\n" +
+                "  <img src=\""+img+"\" alt=\"\" height=\"200px\"></div>\n" +
+                "  <div class=\"card-heading\"><strong>"+content.split(",")[0]+"</strong></div>\n" +
+                "  <div class=\"card-content text-muted\">"+content2+"</div>\n" +
+                "  <div class=\"card-actions\">\n" +
+                "  <div class=\"pull-right text-danger\">"+"question pubulish by<br/>"+username+":"+publishtime+"</div>"+
+                "  </div>\n" +
+                "</a>")
+        }
+        $(document).ready(function(){
+            var data=getdata("/loginApi");
+            if(IsLogin()){
+                $("#login").html("欢迎回来," + data.data.username + "<img src=\"" + data.data.picture + "\" style=width:20px;height:20px></img>");
+                $("#login").attr("href","myhome.html");
+                $("#register").html("退出");;
+                $("#register").attr("id","logout");
+                $("#logout").attr("href", "index.html");
+
+            }
+            $("#logout").click(function () {
+
+                logout();
+            })
+        })
+    </script>
+</div>
+</body>
+</html>

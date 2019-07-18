@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:width="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>question</title>
+    <!-- ZUI 标准版压缩后的 CSS 文件 -->
+
+    <link rel="stylesheet" href="css/zui.min.css">
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script src="js/zui.min.js"></script>
+    <script src=" https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/ini.js"></script>
+</head>
+<body>
+<script>
+    var data_question=postdata("/getQuestionByIdApi",{questionId:geturlprame("questionId")});
+    var data_answer=postdata("getAllAnswerByQuestionIdApi",{questionId:geturlprame("questionId")});
+    var data_messages=postdata("/getMessageByQuestionIdApi",{questionId:geturlprame("questionId")});
+</script>
+<nav class="navbar" role="navigation">
+    <div class="container-fluid">
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand" href="index.html">首页</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+                <li><a href="/myquestion.html">我的问题</a></li>
+                <li><a href="/myanswer.html">我的回答</a></li>
+                <!-- 导航中的下拉菜单 -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login.html" id="login">登录</a></li>
+                <li><a href="/register.html" type="button" id="register">注册</a></li>
+            </ul>
+            <div class="input-group">
+                <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                    <input style="width:1000px" id="inputSearchExample3" type="search" class="form-control search-input" placeholder="搜索">
+                    <span class="input-group-btn" style="float: left">
+                     <button class="btn btn-primary" type="button">搜索</button>
+                    </span>
+                    <label for="inputSearchExample3" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
+                </div>
+            </div>
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+<a id="add_answer" style="float: right"><button type="button" class="btn btn-primary" id='answ-btn'>我来回答</button></a>
+<script>
+    $("#add_answer").attr("href","add_answer.html?questionId="+geturlprame("questionId"));
+</script>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <h3 class="text-center" id="question_content">
+                {{username}} asked ：{{question_content}}    <span style="float: right">收藏<i id="collect" class="icon-star-empty icon-2x"></i></span>
+            </h3>
+            <div id="question">
+                <template v-for="answer in answers">
+                    <h4 class="text-left">{{answer.questionVector}} answered</h4>
+                    <div class="jumbotron">
+                        <div class="pull-right">赞<i class="icon-heart-empty icon-2x liked" :vector="answer.questionVector":answerId="answer.answerId"></i></div>
+                        <div v-html="answer.answerContent"></div>
+
+                        <div style="margin-top: 20px;float: right">published by {{answer.questionVector}} on {{answer.publishTime}}</div>
+                    </div>
+
+                    <div id="message">
+                    <div class="comments" id="messageContent">
+                        <template v-for="message in messages">
+                            <div class="comment" v-if="message.answerId==answer.answerId">
+
+                                <a href="#" class="avatar">
+                                    <img :src="message.messageMan" alt="" class="img">
+                                </a>
+                                <div class="content">
+
+                                    <div class="pull-right text-muted">{{message.publishTime}}</div>
+                                    <div><strong>{{message.messageMan}}</strong> <span class="text-muted" v-if="message.messageManR != null">回复 {{message.messageManR}}</span> </div>
+                                    <div class="text">{{message.messageContent}}</div>
+                                    <div class="actions">
+                                        <a href="javascript:void(0);" :answerId="message.answerId" :messageMan="message.messageMan" class="reply">回复</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <footer>
+                            <div class="reply-form" id="commentReplyForm1">
+                                <a href="###" class="avatar user"></a>
+
+                                    <div class="form-group">
+                                        <textarea class="form-control new-comment-text lg-hide" :id="answer.answerId+'comment'" rows="2" placeholder="撰写评论..."></textarea>
+                                    </div>
+                                    <div class="form-group comment-user">
+                                        <div class="row">
+                                            <div class="col-md-3 lg" >
+                                                <a href="login.html">登录</a> &nbsp;<a href="register.html">注册</a>
+                                            </div>
+                                            <div class="col-md-10"></div>
+                                            <div class="col-md-1"><button type="submit" class="btn btn-block btn-primary lg-hide answerbtn" :answerid="answer.answerId">发布</button></div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+                </template>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+    var iscollect=null;
+    $(document).ready(function(){
+        var data=getdata("/loginApi");
+        $(".lg-hide").hide();
+        if(IsLogin()){
+            $("#login").html("欢迎回来," + data.data.username + "<img src=\"" + data.data.picture + "\" style=width:20px;height:20px></img>");
+            $("#login").attr("href","myhome.html");
+            $("#register").html("退出");;
+            $("#register").attr("id","logout");
+            $("#logout").attr("href", "index.html");
+            $(".user").html("<img src=\" "+ data.data.picture + "\" style=width:20px;height:20px></img>");
+            $(".lg").hide();
+            $(".lg-hide").show();
+            iscollect=postdata("isCollectApi",{questionId:geturlprame("questionId")}).data;
+            if(iscollect){
+                $("#collect").attr("class","icon-star icon-2x")
+            }
+        }
+        $("#logout").click(function () {
+            logout();
+        })
+
+    })
+    new Vue({
+        el:"#question",
+        data:{
+            answers:data_answer.data,
+            messages:data_messages.data,
+
+        }
+    })
+    new Vue({
+        el:"#question_content",
+        data:{
+            question_content:data_question.data.questionContent,
+            username:data_question.data.questionVector ,
+        }
+    })
+
+    $(".img").each(function (index,domEle) {
+        var src="img/"+$(domEle).attr("src")+".jpg";
+        $(domEle).attr("src",src);
+    })
+    $(".reply").each(function (index,domEle) {
+        var d=$(domEle);
+        d.click(function () {
+            var messageman=d.attr("messageman");
+            var answerid=d.attr("answerid");
+            $("#"+answerid+"comment").val("@"+messageman+" ");
+        })
+
+    })
+
+    $(".answerbtn").each(function (index,domEle) {
+        var d=$(domEle);
+        d.click(function () {
+            var answerid=d.attr("answerid");
+            var content=$("#"+answerid+"comment").val();
+            postdata("/addMessageApi",{messageContent:content,question:geturlprame("questionId"),answerId:answerid});
+            $("#"+answerid+"comment").val("");
+            window.location.reload();
+        })
+    })
+
+    $("#collect").click(function () {
+        if(iscollect==null){
+            if(confirm("请先登录")){
+                location='login.html';
+            }
+        }else {
+            iscollect=postdata("isCollectApi",{questionId:geturlprame("questionId")}).data;
+            // postdata("addCollectApi",{questionId:geturlprame("questionId")});
+            // $(this).attr("class","icon-star icon-2x")
+            if(iscollect){
+                $(this).attr("class","icon-star-empty icon-2x");
+                postdata("deleteCollectApi",{questionId:geturlprame("questionId")});
+            }else {
+                $(this).attr("class","icon-star icon-2x");
+                postdata("addCollectApi",{questionId:geturlprame("questionId")});
+            }
+        }
+
+    })
+    $(".liked").each(function (index,domEle) {
+        var answerId;
+        var vector;
+        var isLike=false;
+        if(!IsLogin()){
+            $(domEle).click(function () {
+                if(confirm("请先登录")){
+                    location='login.html';
+                }
+            })
+        }else {
+             answerId=$(domEle).attr("answerId");
+             vector=$(domEle).attr("vector");
+             isLike=postdata("isLikeApi",{vector:vector,answerId:answerId}).data;
+             if(isLike){
+                 $(domEle).attr("class","icon-heart icon-2x liked");
+             }
+
+            var d=$(domEle);
+            d.click(function () {
+                if(isLike){
+                   d.attr("class","icon-heart-empty icon-2x liked");
+                    postdata("deleteLikeApi",{vector:vector,answerId:answerId})
+                    isLike=false;
+                }else {
+                    d.attr("class","icon-heart icon-2x liked");
+                    postdata("addLikeApi",{vector:vector,answerId:answerId})
+                    isLike=true;
+                }
+            })
+        }
+    })
+</script>
+</html>

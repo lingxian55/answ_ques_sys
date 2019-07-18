@@ -1,0 +1,44 @@
+spring:
+  mvc:
+    view:
+      suffix: .html
+      prefix: /
+    dispatch-options-request: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 100MB
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Lingxian55
+    url: jdbc:mysql://localhost:3306/ques_Answ_Sys?serverTimezone=Asia/Shanghai
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    maxActive: 20
+    maxWait: 60000
+    minIdle: 5
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    filters: stat,wall,log4j
+    maxOpenPreparedStatements: 20
+    useGlobalDataSourceStat: true
+    onnectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    parser:
+      allow_unquoted_control_chars: true
+      allow_single_quotes: true
+    time-zone: GMT+8
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
+server:
+  port: 80
+
